@@ -99,18 +99,23 @@ const validateForm = (form) => {
     };
 };
 
-const showValidationErrors = ({ nameError, surnameError, gradeError }) => {
+const clearValidationErrors = () => {
     const nameContainer = document.getElementById('name-container');
     const surnameContainer = document.getElementById('surname-container');
     const gradeContainer = document.getElementById('grade-container');
 
-    const containers = [nameContainer, surnameContainer, gradeContainer];
-    for (let i = 0; i < containers.length; i += 1) {
-        const error = containers[i].querySelector('.error');
+    [nameContainer, surnameContainer, gradeContainer].forEach((container) => {
+        const error = container.querySelector('.error');
         if (error) {
             error.remove();
         }
-    }
+    });
+};
+
+const showValidationErrors = ({ nameError, surnameError, gradeError }) => {
+    const nameContainer = document.getElementById('name-container');
+    const surnameContainer = document.getElementById('surname-container');
+    const gradeContainer = document.getElementById('grade-container');
 
     if (nameError) {
         createElement('p', 'error', nameError, nameContainer);
@@ -137,6 +142,8 @@ document.querySelector('form').addEventListener('submit', (event) => {
     const name = nameInput.value;
     const surname = surnameInput.value;
     const grade = gradeInput.value;
+
+    clearValidationErrors();
 
     const { nameError, surnameError, gradeError } = validateForm({
         name,
