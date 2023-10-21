@@ -1,34 +1,36 @@
 // Создание элемента
 
-const createElement = (tag, classNames, child, parent) => {
-    if (tag) {
-        const element = document.createElement(tag);
-
-        if (classNames) {
-            if (Array.isArray(classNames)) {
-                element.classList.add(...classNames);
-            } else if (typeof classNames === 'string')
-                element.classList.add(classNames);
-        }
-
-        if (child) {
-            if (Array.isArray(child)) {
-                child.forEach((childElem) => {
-                    element.append(childElem);
-                });
-            } else if (typeof child === 'string') {
-                element.innerHTML = child;
-            } else {
-                element.append(child);
-            }
-        }
-
-        if (parent) {
-            parent.append(element);
-        }
-
-        return element;
+const createElement = (tag, { classNames, child, parent }) => {
+    if (!tag) {
+        return;
     }
+
+    const element = document.createElement(tag);
+
+    if (classNames) {
+        if (Array.isArray(classNames)) {
+            element.classList.add(...classNames);
+        } else if (typeof classNames === 'string')
+            element.classList.add(classNames);
+    }
+
+    if (child) {
+        if (Array.isArray(child)) {
+            child.forEach((childElem) => {
+                element.append(childElem);
+            });
+        } else if (typeof child === 'string') {
+            element.innerHTML = child;
+        } else {
+            element.append(child);
+        }
+    }
+
+    if (parent) {
+        parent.append(element);
+    }
+
+    return element;
 };
 
 // Валидация
@@ -118,19 +120,48 @@ const showValidationErrors = ({ nameError, surnameError, gradeError }) => {
     const gradeContainer = document.getElementById('grade-container');
 
     if (nameError) {
-        createElement('p', 'error', nameError, nameContainer);
+        createElement('p', {
+            classNames: 'error',
+            child: nameError,
+            parent: nameContainer,
+        });
     }
     if (surnameError) {
-        createElement('p', 'error', surnameError, surnameContainer);
+        createElement('p', {
+            classNames: 'error',
+            child: surnameError,
+            parent: surnameContainer,
+        });
     }
     if (gradeError) {
-        createElement('p', 'error', gradeError, gradeContainer);
+        createElement('p', {
+            classNames: 'error',
+            child: gradeError,
+            parent: gradeContainer,
+        });
     }
 };
 
-// Точка входа в программу
+// Добавить пункт к списку
 
-const getList = () => document.getElementById('list');
+const createListItem = ({ name, surname, grade }) => {
+    const list = document.getElementById('list');
+
+    const isBadGrade = grade < 3;
+    const listItemClasses = [
+        'list-item',
+        isBadGrade ? 'list-item_yellow' : undefined,
+    ].filter((className) => Boolean(className));
+
+    const item = createElement('li', {
+        classNames: listItemClasses,
+        child: undefined,
+        parent: list,
+    });
+    item.textContent = `${name} ${surname} - ${grade}`;
+};
+
+// Точка входа в программу
 
 document.querySelector('form').addEventListener('submit', (event) => {
     event.preventDefault();
@@ -139,11 +170,11 @@ document.querySelector('form').addEventListener('submit', (event) => {
     const surnameInput = document.querySelector('input[name="surname"]');
     const gradeInput = document.querySelector('input[name="grade"]');
 
+    clearValidationErrors();
+
     const name = nameInput.value;
     const surname = surnameInput.value;
     const grade = gradeInput.value;
-
-    clearValidationErrors();
 
     const { nameError, surnameError, gradeError } = validateForm({
         name,
@@ -161,20 +192,7 @@ document.querySelector('form').addEventListener('submit', (event) => {
         return;
     }
 
-    const list = getList();
-
-    const isBadGrade = grade < 3;
-
-    const item = createElement(
-        'li',
-        [
-            'list-item',
-            isBadGrade === true ? 'list-item_yellow' : undefined,
-        ].filter((className) => Boolean(className)),
-        undefined,
-        list,
-    );
-    item.textContent = `${name} ${surname} - ${grade}`;
+    createListItem({ name, surname, grade });
 
     nameInput.value = '';
     surnameInput.value = '';
