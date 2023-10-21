@@ -37,56 +37,60 @@ const MIN_GRADE = 1;
 const MAX_GRADE = 5;
 const russianLettersRegex = /[а-яё]/i;
 
-const validate = (type, value) => {
-    switch (type) {
-        case 'name': {
-            if (!value) {
-                return 'Введите имя';
-            }
-            if (!russianLettersRegex.test(value)) {
-                return 'Имя должно содержать только буквы русского алфавита';
-            }
-            break;
-        }
-        case 'surname': {
-            if (!value) {
-                return 'Введите фамилию';
-            }
-            if (!russianLettersRegex.test(value))
-                return 'Фамилия должна содержать только буквы русского алфавита';
+const validateCommonName = (name) => {
+    if (!name) {
+        return 'name-not-defined';
+    }
+    if (!russianLettersRegex.test(name)) {
+        return 'only-russian-letters';
+    }
+};
 
-            break;
-        }
-        case 'grade':
-            if (
-                !value ||
-                value > MAX_GRADE ||
-                value < MIN_GRADE ||
-                !parseInt(value)
-            ) {
-                if (!value) {
-                    return 'Введите оценку';
-                }
-                if (!parseInt(value)) {
-                    return 'Оценка должна быть цифрой от 1 до 5';
-                }
-                if (value > 5) return 'Оценка не должна быть больше 5';
-                if (value < 1) {
-                    return 'Оценка не должна быть меньше 1';
-                }
-            }
-            break;
-        default:
-            return undefined;
+const nameErrorsMapper = {
+    'name-not-defined': 'Введите имя',
+    'only-russian-letters':
+        'Имя должно содержать только буквы русского алфавита',
+};
+
+const validateName = (name) => {
+    const errorCode = validateCommonName(name);
+
+    return nameErrorsMapper[errorCode];
+};
+
+const surnameErrorsMapper = {
+    'name-not-defined': 'Введите фамилию',
+    'only-russian-letters':
+        'Фамилия должна содержать только буквы русского алфавита',
+};
+
+const validateSurname = (surname) => {
+    const errorCode = validateCommonName(surname);
+
+    return surnameErrorsMapper[errorCode];
+};
+
+const validateGrade = (grade) => {
+    if (!grade) {
+        return 'Введите оценку';
+    }
+    if (!parseInt(grade)) {
+        return 'Оценка должна быть цифрой от 1 до 5';
+    }
+    if (grade > MAX_GRADE) {
+        return 'Оценка не должна быть больше 5';
+    }
+    if (grade < MIN_GRADE) {
+        return 'Оценка не должна быть меньше 1';
     }
 };
 
 const validateForm = (form) => {
     const { name, surname, grade } = form;
 
-    const nameError = validate('name', name);
-    const surnameError = validate('surname', surname);
-    const gradeError = validate('grade', grade);
+    const nameError = validateName(name);
+    const surnameError = validateSurname(surname);
+    const gradeError = validateGrade(grade);
 
     return {
         nameError,
