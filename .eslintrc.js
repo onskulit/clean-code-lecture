@@ -22,5 +22,6 @@ module.exports = {
     rules: {
         'consistent-return': 'warn',
         radix: 'off',
+        'import/prefer-default-export': 'off',
     },
 };
