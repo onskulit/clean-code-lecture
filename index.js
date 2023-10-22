@@ -1,34 +1,36 @@
 // Создание элемента
 
 const elementCreator = (tag, classNames, child, parent) => {
-    if (tag) {
-        const element = document.createElement(tag);
-
-        if (classNames) {
-            if (Array.isArray(classNames)) {
-                element.classList.add(...classNames);
-            } else if (typeof classNames === 'string')
-                element.classList.add(classNames);
-        }
-
-        if (child) {
-            if (Array.isArray(child)) {
-                child.forEach((childElem) => {
-                    element.append(childElem);
-                });
-            } else if (typeof child === 'string') {
-                element.innerHTML = child;
-            } else {
-                element.append(child);
-            }
-        }
-
-        if (parent) {
-            parent.append(element);
-        }
-
-        return element;
+    if (!tag) {
+        return;
     }
+
+    const element = document.createElement(tag);
+
+    if (classNames) {
+        if (Array.isArray(classNames)) {
+            element.classList.add(...classNames);
+        } else if (typeof classNames === 'string')
+            element.classList.add(classNames);
+    }
+
+    if (child) {
+        if (Array.isArray(child)) {
+            child.forEach((childElem) => {
+                element.append(childElem);
+            });
+        } else if (typeof child === 'string') {
+            element.innerHTML = child;
+        } else {
+            element.append(child);
+        }
+    }
+
+    if (parent) {
+        parent.append(element);
+    }
+
+    return element;
 };
 
 // Валидация
@@ -60,25 +62,19 @@ const validateForm = () => {
 
                 break;
             }
-            case 'grade':
-                if (
-                    !value ||
-                    value > MAX_GRADE ||
-                    value < MIN_GRADE ||
-                    !parseInt(value)
-                ) {
-                    if (!value) {
-                        return 'Введите оценку';
-                    }
-                    if (!parseInt(value)) {
-                        return 'Оценка должна быть цифрой от 1 до 5';
-                    }
-                    if (value > 5) return 'Оценка не должна быть больше 5';
-                    if (value < 1) {
-                        return 'Оценка не должна быть меньше 1';
-                    }
+            case 'grade': {
+                if (!value) {
+                    return 'Введите оценку';
+                }
+                if (!parseInt(value)) {
+                    return 'Оценка должна быть цифрой от 1 до 5';
+                }
+                if (value > MAX_GRADE) return 'Оценка не должна быть больше 5';
+                if (value < MIN_GRADE) {
+                    return 'Оценка не должна быть меньше 1';
                 }
                 break;
+            }
             default:
                 return undefined;
         }
