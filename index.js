@@ -1,6 +1,6 @@
-// Создание элемента
+// Element creation
 
-const elementCreator = (tag, classNames, child, parent) => {
+const createElement = ({ tag, classNames, child, parent }) => {
     if (!tag) {
         return;
     }
@@ -33,57 +33,47 @@ const elementCreator = (tag, classNames, child, parent) => {
     return element;
 };
 
-// Валидация
+// Validation
 
 const MIN_GRADE = 1;
 const MAX_GRADE = 5;
-let isFormValid = false;
 
-const validateForm = () => {
-    const validate = (type, value) => {
-        switch (type) {
-            case 'name': {
-                const russianLettersRegex = /[а-яё]/i;
-                if (!value) {
-                    return 'Введите имя';
-                }
-                if (!russianLettersRegex.test(value)) {
-                    return 'Имя должно содержать только буквы русского алфавита';
-                }
-                break;
-            }
-            case 'surname': {
-                const russianLettersRegex = /[а-яё]/i;
-                if (!value) {
-                    return 'Введите фамилию';
-                }
-                if (!russianLettersRegex.test(value))
-                    return 'Фамилия должна содержать только буквы русского алфавита';
+const validateName = (name) => {
+    const russianLettersRegex = /[а-яё]/i;
+    if (!name) {
+        return 'Введите имя';
+    }
+    if (!russianLettersRegex.test(name)) {
+        return 'Имя должно содержать только буквы русского алфавита';
+    }
+};
 
-                break;
-            }
-            case 'grade': {
-                if (!value) {
-                    return 'Введите оценку';
-                }
-                if (!parseInt(value)) {
-                    return 'Оценка должна быть цифрой от 1 до 5';
-                }
-                if (value > MAX_GRADE) return 'Оценка не должна быть больше 5';
-                if (value < MIN_GRADE) {
-                    return 'Оценка не должна быть меньше 1';
-                }
-                break;
-            }
-            default:
-                return undefined;
-        }
-    };
+const validateSurname = (surname) => {
+    const russianLettersRegex = /[а-яё]/i;
+    if (!surname) {
+        return 'Введите фамилию';
+    }
+    if (!russianLettersRegex.test(surname)) {
+        return 'Фамилия должна содержать только буквы русского алфавита';
+    }
+};
 
-    const nameInput = document.querySelector('input[name="name"]');
-    const surnameInpt = document.querySelector('input[name="surname"]');
-    const gradeInput = document.querySelector('input[name="grade"]');
+const validateGrade = (grade) => {
+    if (!grade) {
+        return 'Введите оценку';
+    }
+    if (!parseInt(grade)) {
+        return 'Оценка должна быть цифрой от 1 до 5';
+    }
+    if (grade > MAX_GRADE) {
+        return 'Оценка не должна быть больше 5';
+    }
+    if (grade < MIN_GRADE) {
+        return 'Оценка не должна быть меньше 1';
+    }
+};
 
+const clearValidationErrors = () => {
     const nameContainer = document.getElementById('name-container');
     const surnameContainer = document.getElementById('surname-container');
     const gradeContainer = document.getElementById('grade-container');
@@ -95,67 +85,113 @@ const validateForm = () => {
             error.remove();
         }
     }
+};
 
-    const name = nameInput.value;
-    const surname = surnameInpt.value;
-    const grade = gradeInput.value;
+const showValidationError = ({ nameError, surnameError, gradeError }) => {
+    const nameContainer = document.getElementById('name-container');
+    const surnameContainer = document.getElementById('surname-container');
+    const gradeContainer = document.getElementById('grade-container');
 
-    const nameErr = validate('name', name);
-    if (nameErr) {
-        elementCreator('p', 'error', nameErr, nameContainer);
+    if (nameError) {
+        createElement({
+            tag: 'p',
+            classNames: 'error',
+            child: nameError,
+            parent: nameContainer,
+        });
     }
-    const surnameErr = validate('surname', surname);
-    if (surnameErr) {
-        elementCreator('p', 'error', surnameErr, surnameContainer);
+    if (surnameError) {
+        createElement({
+            tag: 'p',
+            classNames: 'error',
+            child: surnameError,
+            parent: surnameContainer,
+        });
     }
-    const gradeErr = validate('grade', grade);
-    if (gradeErr) {
-        elementCreator('p', 'error', gradeErr, gradeContainer);
-    }
-
-    if (nameErr || surnameErr || gradeErr) {
-        isFormValid = false;
-    } else {
-        isFormValid = true;
+    if (gradeError) {
+        createElement({
+            tag: 'p',
+            classNames: 'error',
+            child: gradeError,
+            parent: gradeContainer,
+        });
     }
 };
 
-// Точка входа в программу
+const validateForm = ({ name, surname, grade }) => {
+    clearValidationErrors();
 
-const getList = () => document.getElementById('list');
+    const nameError = validateName(name);
+    const surnameError = validateSurname(surname);
+    const gradeError = validateGrade(grade);
 
-document.querySelector('form').addEventListener('submit', (event) => {
-    event.preventDefault();
+    showValidationError({ nameError, surnameError, gradeError });
 
-    validateForm();
+    return !(nameError || surnameError || gradeError);
+};
 
-    if (!isFormValid) {
-        return;
-    }
+// Create list item
 
+const createListItem = ({ name, surname, grade }) => {
+    const list = document.getElementById('list');
+
+    const isBadGrade = grade < 3;
+
+    const classNames = [
+        'list-item',
+        isBadGrade === true ? 'list-item_yellow' : undefined,
+    ].filter((className) => Boolean(className));
+
+    const item = createElement({
+        tag: 'li',
+        classNames,
+        parent: list,
+    });
+    item.textContent = `${name} ${surname} - ${grade}`;
+};
+
+// Form
+
+const getFormValues = () => {
     const nameInput = document.querySelector('input[name="name"]');
     const surnameInput = document.querySelector('input[name="surname"]');
     const gradeInput = document.querySelector('input[name="grade"]');
-    const list = getList();
 
     const name = nameInput.value;
     const surname = surnameInput.value;
     const grade = gradeInput.value;
 
-    const isBadGrade = grade < 3;
+    return { name, surname, grade };
+};
 
-    const item = elementCreator(
-        'li',
-        [
-            'list-item',
-            isBadGrade === true ? 'list-item_yellow' : undefined,
-        ].filter((className) => Boolean(className)),
-        undefined,
-        list,
-    );
-    item.textContent = `${name} ${surname} - ${grade}`;
+const clearFormInputs = () => {
+    const nameInput = document.querySelector('input[name="name"]');
+    const surnameInput = document.querySelector('input[name="surname"]');
+    const gradeInput = document.querySelector('input[name="grade"]');
 
     nameInput.value = '';
     surnameInput.value = '';
     gradeInput.value = '';
+};
+
+// Entry point
+
+document.querySelector('form').addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const { name, surname, grade } = getFormValues();
+
+    const isFormValid = validateForm({
+        name,
+        surname,
+        grade,
+    });
+
+    if (!isFormValid) {
+        return;
+    }
+
+    createListItem({ name, surname, grade });
+
+    clearFormInputs();
 });
