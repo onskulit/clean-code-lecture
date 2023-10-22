@@ -1,8 +1,8 @@
 // Создание элемента
 
-const elementCreator = (elem, classNames, child, parent) => {
-    if (elem) {
-        const element = document.createElement(elem);
+const elementCreator = (tag, classNames, child, parent) => {
+    if (tag) {
+        const element = document.createElement(tag);
 
         if (classNames) {
             if (Array.isArray(classNames)) {
@@ -33,35 +33,40 @@ const elementCreator = (elem, classNames, child, parent) => {
 
 // Валидация
 
-const ONE = 1;
-const FIVE = 5;
-let formIsValid = false;
+const MIN_GRADE = 1;
+const MAX_GRADE = 5;
+let isFormValid = false;
 
 const validateForm = () => {
     const validate = (type, value) => {
         switch (type) {
             case 'name': {
-                const regexName = /[а-яё]/i;
+                const russianLettersRegex = /[а-яё]/i;
                 if (!value) {
                     return 'Введите имя';
                 }
-                if (!regexName.test(value)) {
+                if (!russianLettersRegex.test(value)) {
                     return 'Имя должно содержать только буквы русского алфавита';
                 }
                 break;
             }
             case 'surname': {
-                const regexSurname = /[а-яё]/i;
+                const russianLettersRegex = /[а-яё]/i;
                 if (!value) {
                     return 'Введите фамилию';
                 }
-                if (!regexSurname.test(value))
+                if (!russianLettersRegex.test(value))
                     return 'Фамилия должна содержать только буквы русского алфавита';
 
                 break;
             }
             case 'grade':
-                if (!value || value > FIVE || value < ONE || !parseInt(value)) {
+                if (
+                    !value ||
+                    value > MAX_GRADE ||
+                    value < MIN_GRADE ||
+                    !parseInt(value)
+                ) {
                     if (!value) {
                         return 'Введите оценку';
                     }
@@ -95,27 +100,27 @@ const validateForm = () => {
         }
     }
 
-    const nameValue = nameInput.value;
-    const surnameValue = surnameInpt.value;
-    const gradeValue = gradeInput.value;
+    const name = nameInput.value;
+    const surname = surnameInpt.value;
+    const grade = gradeInput.value;
 
-    const nameErr = validate('name', nameValue);
+    const nameErr = validate('name', name);
     if (nameErr) {
         elementCreator('p', 'error', nameErr, nameContainer);
     }
-    const surnameErr = validate('surname', surnameValue);
+    const surnameErr = validate('surname', surname);
     if (surnameErr) {
         elementCreator('p', 'error', surnameErr, surnameContainer);
     }
-    const gradeErr = validate('grade', gradeValue);
+    const gradeErr = validate('grade', grade);
     if (gradeErr) {
         elementCreator('p', 'error', gradeErr, gradeContainer);
     }
 
     if (nameErr || surnameErr || gradeErr) {
-        formIsValid = false;
+        isFormValid = false;
     } else {
-        formIsValid = true;
+        isFormValid = true;
     }
 };
 
@@ -123,12 +128,12 @@ const validateForm = () => {
 
 const getList = () => document.getElementById('list');
 
-document.querySelector('form').addEventListener('submit', (e) => {
-    e.preventDefault();
+document.querySelector('form').addEventListener('submit', (event) => {
+    event.preventDefault();
 
     validateForm();
 
-    if (!formIsValid) {
+    if (!isFormValid) {
         return;
     }
 
@@ -141,14 +146,14 @@ document.querySelector('form').addEventListener('submit', (e) => {
     const surname = surnameInput.value;
     const grade = gradeInput.value;
 
-    const isNotGoodGrade = grade < 3;
+    const isBadGrade = grade < 3;
 
     const item = elementCreator(
         'li',
         [
             'list-item',
-            isNotGoodGrade === true ? 'list-item_yellow' : undefined,
-        ].filter((c) => Boolean(c)),
+            isBadGrade === true ? 'list-item_yellow' : undefined,
+        ].filter((className) => Boolean(className)),
         undefined,
         list,
     );
