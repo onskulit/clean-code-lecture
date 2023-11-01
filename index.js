@@ -1,33 +1,29 @@
 // Создание элемента
 
 const createElement = (tag, classNames, child, parent) => {
-    if (tag) {
-        const element = document.createElement(tag);
-
-        if (classNames) {
-            if (Array.isArray(classNames)) {
-                element.classList.add(...classNames);
-            } else if (typeof classNames === 'string') element.classList.add(classNames);
-        }
-
-        if (child) {
-            if (Array.isArray(child)) {
-                child.forEach((childElem) => {
-                    element.append(childElem);
-                });
-            } else if (typeof child === 'string') {
-                element.innerHTML = child;
-            } else {
-                element.append(child);
-            }
-        }
-
-        if (parent) {
-            parent.append(element);
-        }
-
-        return element;
+    if (!tag) {
+        return;
     }
+
+    const element = document.createElement(tag);
+
+    if (classNames) {
+        if (Array.isArray(classNames)) {
+            element.classList.add(...classNames);
+        } else if (typeof classNames === 'string') {
+            element.classList.add(classNames);
+        }
+    }
+
+    if (child) {
+        element.append(child);
+    }
+
+    if (parent) {
+        parent.append(element);
+    }
+
+    return element;
 };
 
 // Валидация
@@ -54,24 +50,27 @@ const validateForm = () => {
                 if (!value) {
                     return 'Введите фамилию';
                 }
-                if (!russianLettersRegex.test(value)) return `Фамилия должна содержать только буквы русского алфавита`;
+                if (!russianLettersRegex.test(value)) {
+                    return `Фамилия должна содержать только буквы русского алфавита`;
+                }
 
                 break;
             }
-            case `grade`:
-                if (!value || value > MAX_GRADE || value < MIN_GRADE || !parseInt(value, 10)) {
-                    if (!value) {
-                        return 'Введите оценку';
-                    }
-                    if (!parseInt(value, 10)) {
-                        return `Оценка должна быть цифрой от ${MIN_GRADE} до ${MAX_GRADE}`;
-                    }
-                    if (value > MAX_GRADE) return `Оценка не должна быть больше ${MAX_GRADE}`;
-                    if (value < MIN_GRADE) {
-                        return `Оценка не должна быть меньше ${MIN_GRADE}`;
-                    }
+            case `grade`: {
+                if (!value) {
+                    return 'Введите оценку';
+                }
+                const gradeNumber = parseInt(value, 10);
+                if (!gradeNumber) {
+                    return `Оценка должна быть цифрой от ${MIN_GRADE} до ${MAX_GRADE}`;
+                }
+                if (gradeNumber > MAX_GRADE) return `Оценка не должна быть больше ${MAX_GRADE}`;
+                if (gradeNumber < MIN_GRADE) {
+                    return `Оценка не должна быть меньше ${MIN_GRADE}`;
                 }
                 break;
+            }
+
             default:
                 return undefined;
         }
@@ -110,16 +109,14 @@ const validateForm = () => {
         createElement('p', 'error', gradeError, gradeContainer);
     }
 
-    if (nameError || surnameError || gradeError) {
-        isFormValid = false;
-    } else {
-        isFormValid = true;
-    }
+    isFormValid = !(nameError || surnameError || gradeError);
 };
 
 // Точка входа в программу
 
 const getList = () => document.getElementById('list');
+
+const ACCEPTABLE_GRADE = 3;
 
 document.querySelector('form').addEventListener('submit', (event) => {
     event.preventDefault();
@@ -139,11 +136,11 @@ document.querySelector('form').addEventListener('submit', (event) => {
     const surname = surnameInput.value;
     const grade = gradeInput.value;
 
-    const isBadGrade = grade < 3;
+    const isBadGrade = grade < ACCEPTABLE_GRADE;
 
     const item = createElement(
         'li',
-        ['list-item', isBadGrade === true ? `list-item_yellow` : undefined].filter((className) => Boolean(className)),
+        ['list-item', isBadGrade ? `list-item_yellow` : undefined].filter((className) => Boolean(className)),
         undefined,
         list
     );
