@@ -1,11 +1,14 @@
 {
-  "name": "clean-code",
-  "version": "1.0.0",
-  "description": "Example for clean-code lection",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "dislaty@mail.ru",
-  "license": "ISC"
+    "name": "clean-code",
+    "version": "1.0.0",
+    "description": "Example for clean-code lection",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "dislaty@mail.ru",
+    "license": "ISC",
+    "devDependencies": {
+        "prettier": "3.0.3"
+    }
 }
